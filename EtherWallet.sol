@@ -2,23 +2,25 @@
 pragma solidity 0.8.7;
 
 contract EtherWallet {
-    address payable public owner;
+    address public owner;
 
     constructor() {
-        owner = payable(msg.sender);
+        owner = msg.sender;
     }
 
-    receive() external payable {
-        
+    modifier onlyOwner() {
+        require(msg.sender == owner, "Only OWNER can call this function().");
+        _;
+    }
+    
+    receive() external payable {}
+
+    function withdraw(uint amount) public payable onlyOwner {
+       require(address(this).balance >= amount, "Insufficient Balance");
+       payable(msg.sender).transfer(amount);
     }
 
-
-    function transferEther(uint _amount) external {
-        require(msg.sender == owner, "Function call is not done by owner");
-        payable(msg.sender).transfer(_amount);
-    }
-
-    function getbalance() external view returns(uint) {
+    function getBalance() public view returns(uint) {
         return address(this).balance;
     }
 }
